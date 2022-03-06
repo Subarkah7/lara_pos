@@ -26,7 +26,8 @@ class Cart extends Component
     public function render()
     {
 
-        $products = ModelsProduct::where('name', 'like', '%'.$this->search.'%')->paginate(4);
+        $products = ModelsProduct::where('name', 'like', '%'.$this->search.'%')
+            ->orderBy('id', 'desc')->paginate(8);
 
         $condition = new CartCondition([
             'name'  => 'pajak',
