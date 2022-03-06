@@ -110,10 +110,6 @@
                         </tr>
 
                     </table>
-
-                 
-                    
-                   
                     <div>
                         <div class="row">
                             <div class="col-md-6">
@@ -124,12 +120,67 @@
                             </div>
                         </div>
                     </div>
-                    <div>
-                        <button class="btn btn-success btn-block w-100 mt-4">Save Transaction</button>
-
+                    <div class="form-group mt-4 mb-2">
+                        <input type="number" wire:model="payment" class="form-control" id="payment" placeholder="Input customer Payment">
+                        <input type="hidden" id="total" value="{{ $summary['total']}}">
                     </div>
+                    <form wire:submit.prevent="handleSubmit">
+                        <div>
+                            <label >Payment</label>
+                            <h1 id="paymentText" wire:ignore>Rp. 0</h1>
+                        </div>
+
+                        <div>
+                            <label> Kembalian</label>
+                            <h1 id="kembalianText" wire:ignore>Rp. 0</h1>
+                        </div>
+
+                        <div>
+                            <button wire:ignore disabled class="btn btn-success btn-block w-100 mt-4" id="saveButton">Save Transaction</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+
+@push('scripts-custom')
+<script>
+    payment.oninput = () => {
+        const paymentAmount = document.getElementById("payment").value
+        const totalAmount = document.getElementById("total").value
+        const kembalian = paymentAmount - totalAmount
+        document.getElementById("kembalianText").innerHTML = `Rp ${rupiah(kembalian)} ,00`
+        document.getElementById("paymentText").innerHTML = `Rp ${rupiah(paymentAmount)} ,00`
+        const saveButton =  document.getElementById("saveButton")
+        if(kembalian < 0){
+            saveButton.disabled = true
+        }else{
+            saveButton.disabled = false
+        }
+    }
+
+
+    const rupiah = (angka) => {
+        const numberString = angka.toString()
+        const split = numberString.split(',')
+        const sisa = split[0].length % 3
+        let rupiah = split[0].substr(0, sisa)
+        const ribuan = split[0].substr(sisa).match(/\d{1,3}/gi)
+        if(ribuan){
+            const separator = sisa ? '.' : ''
+            rupiah += separator + ribuan.join('.')
+        }
+        return split[1] != undefined ? rupiah + ',' + split[1] : rupiah
+    }
+
+    saveButton.onclick = () => {
+        document.getElementById("kembalianText").innerHTML = `Rp 0`
+        document.getElementById("paymentText").innerHTML = `Rp 0`
+    }
+</script>
+    
+@endpush
