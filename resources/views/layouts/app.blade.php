@@ -23,9 +23,15 @@
 <body>
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{{ url('/home') }}">
+                    Home
+                </a>
+                <a class="navbar-brand" href="{{ url('/products') }}">
+                    Products
+                </a>
+                <a class="navbar-brand" href="{{ url('/cart') }}">
+                    POS
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
