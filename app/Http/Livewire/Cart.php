@@ -6,15 +6,27 @@ use App\Models\Product as ModelsProduct;
 use Carbon\Carbon;
 use Darryldecode\Cart\CartCondition;
 use Livewire\Component;
+use Livewire\WithPagination;
+
 
 class Cart extends Component
 {
     public $tax = '0%';
+    use WithPagination;
+    protected $paginationTheme = 'bootstrap';
+
+    public $search;
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
 
     public function render()
     {
 
-        $products = ModelsProduct::orderBy('id', 'desc')->get();
+        $products = ModelsProduct::where('name', 'like', '%'.$this->search.'%')->paginate(4);
 
         $condition = new CartCondition([
             'name'  => 'pajak',
@@ -104,4 +116,51 @@ class Cart extends Component
     {
         $this->tax = '0%';
     }
+
+
+    public function increaseItem($rowId)
+    {   
+        $product_id = substr($rowId, 4);        
+        $product = ModelsProduct::find($product_id);
+
+        $cart = \Cart::session(Auth()->id())->getContent();
+        $checkItem = $cart->whereIn('id', $rowId);
+
+        if($product->qty == $checkItem[$rowId]->quantity) {
+            session()->flash('error', 'Jumlah item '.$product->name.' kurang');
+        } else {
+            \Cart::session(Auth()->id())->update($rowId, [
+                'quantity'  => [
+                    'relative'  => true,
+                    'value'     => 1
+                ]
+                ]);
+        }
+
+       
+        
+    }
+
+
+    public function decreaseItem($rowId)
+    {   
+        $cart = \Cart::session(Auth()->id())->getContent();
+        $checkItem = $cart->whereIn('id', $rowId);
+
+        if($checkItem[$rowId]->quantity == 1) {
+            $this->removeItem($rowId);
+        } else {
+            \Cart::session(Auth()->id())->update($rowId, [
+                'quantity'  => [
+                    'relative'  => true,
+                    'value'     => -1
+                ]
+                ]); 
+        }
+    }
+
+    public function removeItem($rowId) {
+        \Cart::session(Auth()->id())->remove($rowId);
+    }
+
 }

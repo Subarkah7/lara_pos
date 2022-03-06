@@ -12,11 +12,12 @@ class Product extends Component
 
     use WithFileUploads;
 
+
     public $name, $image, $desc, $qty, $price;
 
     public function render()
     {
-        $products = ModelsProduct::orderBy('id', 'desc')->get();
+        $products = ModelsProduct::orderBy('id', 'desc')->paginate(4);
         return view('livewire.product', [
             'products' => $products
         ]);
